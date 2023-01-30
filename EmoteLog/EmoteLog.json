@@ -1,12 +1,11 @@
 {
-  "Author": "Speedas",
-  "Name": "Emote log",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
-  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
-  "InternalName": "EmoteLog",
-  "ApplicableVersion": "any",
-    "Tags": [
-      "Emote",
-      "Social"
+    "Author": "Speedas",
+    "Name": "Emote log",
+    "Punchline": "Track who used what emotes on you.",
+    "Description": "Adds a window logging all emotes used on you, so you never miss a sneaky dote again.",
+    "InternalName": "EmoteLog",
+    "ApplicableVersion": "any",
+    "CategoryTags": [
+        "social"
     ]
 }
