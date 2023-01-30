@@ -60,6 +60,11 @@ namespace EmoteLog.Data
         public void Dispose()
         {
             this.Plugin.EmoteReaderHooks.OnEmote -= onEmote;
+            Clear();
+        }
+
+        public void Clear()
+        {
             Log.Clear();
             CollapsedLog.Clear();
         }

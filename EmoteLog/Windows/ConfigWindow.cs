@@ -27,23 +27,77 @@ public class ConfigWindow : Window, IDisposable
         var logSize = this.Configuration.LogSize;
         var collapseSpam = this.Configuration.CollapseSpam;
         var showTimestamps = this.Configuration.ShowTimestamps;
+        var openOnLogin = this.Configuration.OpenOnLogin;
+        var moveWindow = this.Configuration.MoveWindow;
+        var resizeWindow = this.Configuration.ResizeWindow;
+        var showWindowFrames = this.Configuration.ShowWindowFrames;
+        var inCombat = this.Configuration.InCombat;
+        var inInstance = this.Configuration.InInstance;
+        var inCutscenes = this.Configuration.InCutscenes;
+        var hideEmpty = this.Configuration.HideEmpty;
+        var showClearButton = this.Configuration.ShowClearButton;
         if (ImGui.InputInt("Log size", ref logSize))
         {
             if (logSize > 0 )
             {
-                this.Configuration.LogSize = logSize;
-                this.Configuration.Save();
+                Configuration.LogSize = logSize;
+                Configuration.Save();
             }
         }
-        if (ImGui.Checkbox("Collapse spam into one line", ref collapseSpam))
+        if (ImGui.Checkbox("Collapse duplicates into one line", ref collapseSpam))
         {
-            this.Configuration.CollapseSpam = collapseSpam;
-            this.Configuration.Save();
+            Configuration.CollapseSpam = collapseSpam;
+            Configuration.Save();
         }
         if (ImGui.Checkbox("Show timestamps", ref showTimestamps))
         {
-            this.Configuration.ShowTimestamps = showTimestamps;
-            this.Configuration.Save();
+            Configuration.ShowTimestamps = showTimestamps;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Open on login", ref openOnLogin))
+        {
+            Configuration.OpenOnLogin = openOnLogin;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Allow moving the Emote Log", ref moveWindow))
+        {
+            Configuration.MoveWindow = moveWindow;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Allow resizing the Emote Log", ref resizeWindow))
+        {
+            Configuration.ResizeWindow = resizeWindow;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show Emote Log's frames", ref showWindowFrames))
+        {
+            Configuration.ShowWindowFrames = showWindowFrames;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show Emote Log in combat", ref inCombat))
+        {
+            Configuration.InCombat = inCombat;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show Emote Log in instance", ref inInstance))
+        {
+            Configuration.InInstance = inInstance;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show Emote Log in cutscene", ref inCutscenes))
+        {
+            Configuration.InCutscenes = inCutscenes;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Hide Emote Log when empty", ref hideEmpty))
+        {
+            Configuration.HideEmpty = hideEmpty;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show clear button in the Emote Log", ref showClearButton))
+        {
+            Configuration.ShowClearButton = showClearButton;
+            Configuration.Save();
         }
     }
 }

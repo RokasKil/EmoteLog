@@ -12,8 +12,8 @@ namespace EmoteLog.Data
         public EmoteEntry EmoteEntry { get; set; }
         public CollapsedEmoteEntry (int count, EmoteEntry emoteEntry)
         {
-            this.Count = count;
-            this.EmoteEntry = emoteEntry;
+            Count = count;
+            EmoteEntry = emoteEntry;
         }
 
     }

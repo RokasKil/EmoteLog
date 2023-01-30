@@ -27,7 +27,7 @@ namespace EmoteLog.Data
             EmoteName = emoteName;
         }
         public EmoteEntry(string playerName, uint homeWorld, ushort emoteId, string emoteName) : this(DateTime.Now, playerName, homeWorld, emoteId, emoteName) { }
-        public EmoteEntry(string playerName, uint homeWorld, ushort emoteId) : this(playerName, homeWorld, emoteId, EmoteDataUtils.getEmoteById(emoteId) ?? "null") { }
+        public EmoteEntry(string playerName, uint homeWorld, ushort emoteId) : this(playerName, homeWorld, emoteId, EmoteDataUtils.GetEmoteNameById(emoteId) ?? "null") { }
 
         public static bool operator ==(EmoteEntry a, EmoteEntry b)
         {

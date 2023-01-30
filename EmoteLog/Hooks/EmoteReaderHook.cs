@@ -14,33 +14,21 @@ namespace EmoteLog.Hooks
     {
         public delegate void EmoteDelegate(PlayerCharacter playerCharacter, ushort emoteId);
 
-        public event EmoteDelegate OnEmote;
+        public event EmoteDelegate? OnEmote;
 
         public delegate void OnEmoteFuncDelegate(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2);
         private readonly Hook<OnEmoteFuncDelegate> hookEmote;
 
-        public bool IsValid = false;
-
         public EmoteReaderHooks()
         {
-            try
-            {
-                var emoteFuncPtr = PluginServices.SigScanner.ScanText("48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 30 4c 8b 74 24 60 48 8b d9 48 81 c1 60 2f 00 00");
-                hookEmote = Hook<OnEmoteFuncDelegate>.FromAddress(emoteFuncPtr, OnEmoteDetour);
-                hookEmote.Enable();
-
-                IsValid = true;
-            }
-            catch (Exception ex)
-            {
-                PluginLog.Error(ex, "oh noes!");
-            }
+            var emoteFuncPtr = PluginServices.SigScanner.ScanText("48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 30 4c 8b 74 24 60 48 8b d9 48 81 c1 60 2f 00 00");
+            hookEmote = Hook<OnEmoteFuncDelegate>.FromAddress(emoteFuncPtr, OnEmoteDetour);
+            hookEmote.Enable();
         }
 
         public void Dispose()
         {
             hookEmote?.Dispose();
-            IsValid = false;
         }
 
         void OnEmoteDetour(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2)
