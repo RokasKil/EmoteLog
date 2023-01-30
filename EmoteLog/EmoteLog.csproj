@@ -60,5 +60,7 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-
+    <Target Name="CopyAssets" BeforeTargets="Build">
+	    <Copy SourceFiles="$(ProjectDir)\icon\icon.png" DestinationFolder="$(OutDir)\images" />
+    </Target>
 </Project>
