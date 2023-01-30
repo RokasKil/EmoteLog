@@ -1,8 +1,10 @@
 //Lifted from https://github.com/MgAl2O4/PatMeDalamud
 //and modified by me
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using EmoteLog.Utils;
 using System;
 using System.Linq;
 
@@ -10,8 +12,9 @@ namespace EmoteLog.Hooks
 {
     public class EmoteReaderHooks : IDisposable
     {
+        public delegate void EmoteDelegate(PlayerCharacter playerCharacter, ushort emoteId);
 
-        public Action<GameObject, ushort> OnEmote;
+        public event EmoteDelegate OnEmote;
 
         public delegate void OnEmoteFuncDelegate(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2);
         private readonly Hook<OnEmoteFuncDelegate> hookEmote;
@@ -43,26 +46,21 @@ namespace EmoteLog.Hooks
         void OnEmoteDetour(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2)
         {
             // unk - some field of event framework singleton? doesn't matter here anyway
-             PluginLog.Log($"Emote >> unk:{unk:X}, instigatorAddr:{instigatorAddr:X}, emoteId:{emoteId}, targetId:{targetId:X}, unk2:{unk2:X}");
+            //PluginLog.Log($"Emote >> unk:{unk:X}, instigatorAddr:{instigatorAddr:X}, emoteId:{emoteId}, targetId:{targetId:X}, unk2:{unk2:X}");
 
-            /*if (PluginServices.ClientState.LocalPlayer != null)
+            if (PluginServices.ClientState.LocalPlayer != null)
             {
-                if (targetId == PluginServices.ClientState.LocalPlayer.ObjectId)
+                if (targetId == PluginServices.ClientState.LocalPlayer.ObjectId/* || true*/)
                 {
                     var instigatorOb = PluginServices.ObjectTable.FirstOrDefault(x => (ulong)x.Address == instigatorAddr);
-                    if (instigatorOb != null)
+                    PluginLog.Log("instigatorOb");
+                    if (instigatorOb != null && instigatorOb is PlayerCharacter playerCharacter)
                     {
-                        bool canCount = (instigatorOb.ObjectId != targetId);
-#if DEBUG
-                        canCount = true;
-#endif  
-                        if (canCount)
-                        {
-                            OnEmote?.Invoke(instigatorOb, emoteId);
-                        }
+                        PluginLog.Log("Invoking");
+                        OnEmote?.Invoke(playerCharacter, emoteId);
                     }
                 }
-            }*/
+            }
 
             hookEmote.Original(unk, instigatorAddr, emoteId, targetId, unk2);
         }

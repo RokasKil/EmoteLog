@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
@@ -10,11 +10,11 @@ public class ConfigWindow : Window, IDisposable
     private Configuration Configuration;
 
     public ConfigWindow(Plugin plugin) : base(
-        "A Wonderful Configuration Window",
+        "Emote log configuration",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse)
+        ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize)
     {
-        this.Size = new Vector2(232, 75);
+        this.Size = new Vector2(0, 0);
         this.SizeCondition = ImGuiCond.Always;
 
         this.Configuration = plugin.Configuration;
@@ -24,12 +24,25 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        // can't ref a property, so use a local copy
-        var configValue = this.Configuration.SomePropertyToBeSavedAndWithADefault;
-        if (ImGui.Checkbox("Random Config Bool", ref configValue))
+        var logSize = this.Configuration.LogSize;
+        var collapseSpam = this.Configuration.CollapseSpam;
+        var showTimestamps = this.Configuration.ShowTimestamps;
+        if (ImGui.InputInt("Log size", ref logSize))
         {
-            this.Configuration.SomePropertyToBeSavedAndWithADefault = configValue;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
+            if (logSize > 0 )
+            {
+                this.Configuration.LogSize = logSize;
+                this.Configuration.Save();
+            }
+        }
+        if (ImGui.Checkbox("Collapse spam into one line", ref collapseSpam))
+        {
+            this.Configuration.CollapseSpam = collapseSpam;
+            this.Configuration.Save();
+        }
+        if (ImGui.Checkbox("Show timestamps", ref showTimestamps))
+        {
+            this.Configuration.ShowTimestamps = showTimestamps;
             this.Configuration.Save();
         }
     }

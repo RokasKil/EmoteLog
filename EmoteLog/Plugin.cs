@@ -5,13 +5,15 @@ using System.IO;
 using Dalamud.Interface.Windowing;
 using EmoteLog.Windows;
 using EmoteLog.Hooks;
+using EmoteLog.Utils;
+using EmoteLog.Data;
 
 namespace EmoteLog
 {
     public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Emote Log Plugin";
-        private const string CommandName = "/el ";
+        private const string CommandName = "/el";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
@@ -20,7 +22,8 @@ namespace EmoteLog
 
         private ConfigWindow ConfigWindow { get; init; }
         private EmoteLogWindow MainWindow { get; init; }
-        private EmoteReaderHooks EmoteReaderHooks { get; init; }
+        public EmoteReaderHooks EmoteReaderHooks { get; init; }
+        public EmoteQueue EmoteQueue { get; init; }
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager)
@@ -32,6 +35,7 @@ namespace EmoteLog
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
+            this.EmoteReaderHooks = new EmoteReaderHooks();
 
             ConfigWindow = new ConfigWindow(this);
             MainWindow = new EmoteLogWindow(this);
@@ -46,17 +50,17 @@ namespace EmoteLog
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            this.EmoteReaderHooks = new EmoteReaderHooks();
+            this.EmoteQueue = new EmoteQueue(this);
         }
 
         public void Dispose()
         {
+            this.EmoteQueue.Dispose();
             this.WindowSystem.RemoveAllWindows();
-            
             ConfigWindow.Dispose();
             MainWindow.Dispose();
-            EmoteReaderHooks.Dispose();
             this.CommandManager.RemoveHandler(CommandName);
+            EmoteReaderHooks.Dispose();
         }
 
         private void OnCommand(string command, string args)

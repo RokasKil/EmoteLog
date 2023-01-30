@@ -11,16 +11,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Game;
 
-namespace EmoteLog
+namespace EmoteLog.Utils
 {
     public class PluginServices
     {
-        //[PluginService] public static ChatGui ChatGui { get; set; } = null!;
+        [PluginService] public static ChatGui ChatGui { get; set; } = null!;
         [PluginService] public static ObjectTable ObjectTable { get; set; } = null!;
         [PluginService] public static ClientState ClientState { get; set; } = null!;
         [PluginService] public static SigScanner SigScanner { get; set; } = null!;
-        //[PluginService] public static GameGui GameGui { get; set; } = null!;
-        //[PluginService] public static DataManager DataManager { get; set; } = null!;
+        [PluginService] public static DataManager DataManager { get; set; } = null!;
         public static void Initialize(DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<PluginServices>();
