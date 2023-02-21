@@ -30,6 +30,10 @@ public class EmoteLogWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
         this.RespectCloseHotkey = false;
+
+        this.SizeCondition = ImGuiCond.FirstUseEver;
+        this.Size = new Vector2(300, 150);
+
         Plugin = plugin;
     }
 
