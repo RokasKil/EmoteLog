@@ -14,12 +14,18 @@ using EmoteLog.Utils;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface.Components;
 using Dalamud.Interface;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace EmoteLog.Windows;
 
 public class EmoteLogWindow : Window, IDisposable
 {
     private Plugin Plugin { get; set; }
+
+    private ImFontPtr fontPtr;
+
+    private ImFontPtr iconFontPtr;
 
     public EmoteLogWindow(Plugin plugin) : base(
         "Emote Log", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -34,12 +40,38 @@ public class EmoteLogWindow : Window, IDisposable
         this.SizeCondition = ImGuiCond.FirstUseEver;
         this.Size = new Vector2(300, 150);
 
+
+
         Plugin = plugin;
+
+        Plugin.PluginInterface.UiBuilder.BuildFonts += this.HandleBuildFonts;
+        Plugin.PluginInterface.UiBuilder.RebuildFonts();
+    }
+    
+    private unsafe void HandleBuildFonts()
+    {
+        ImFontConfigPtr iconFontConfig = ImGuiNative.ImFontConfig_ImFontConfig();
+
+        iconFontConfig.OversampleH = 1;
+        iconFontConfig.OversampleV = 1;
+        iconFontConfig.PixelSnapH = true;
+
+        var fontPath = Path.Combine(Plugin.PluginInterface.DalamudAssetDirectory.FullName, "UIRes", "NotoSansCJKjp-Medium.otf");
+        this.fontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, Plugin.Configuration.FontSize * 4.0f / 3.0f + 1, iconFontConfig);
+
+        var iconRangeHandle = GCHandle.Alloc(new ushort[] { (ushort)FontAwesomeIcon.Trash, (ushort)FontAwesomeIcon.Trash + 1, 0, }, GCHandleType.Pinned);
+        iconFontConfig.GlyphRanges = iconRangeHandle.AddrOfPinnedObject();
+        
+        var iconFontPath = Path.Combine(Plugin.PluginInterface.DalamudAssetDirectory.FullName, "UIRes", "FontAwesomeFreeSolid.otf");
+        this.iconFontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(iconFontPath, Plugin.Configuration.FontSize * 4.0f / 3.0f, iconFontConfig);
+
+        iconFontConfig.Destroy();
+        iconRangeHandle.Free();
     }
 
     public void Dispose()
     {
-
+        Plugin.PluginInterface.UiBuilder.BuildFonts -= this.HandleBuildFonts;
     }
     public override bool DrawConditions()
     {
@@ -71,6 +103,7 @@ public class EmoteLogWindow : Window, IDisposable
     {
         var height = ImGui.GetContentRegionAvail().Y;
 
+        ImGui.PushFont(this.fontPtr);
         if (ImGui.BeginListBox("##emoteLog", new Vector2(-1, height)))
         {
 
@@ -91,18 +124,24 @@ public class EmoteLogWindow : Window, IDisposable
 
             ImGui.EndListBox();
         }
+        ImGui.PopFont();
 
-        if (Plugin.Configuration.ShowClearButton) {
-            ImGui.PushFont(UiBuilder.IconFont);
+        if (Plugin.Configuration.ShowClearButton)
+        {
+            var currentIconFontPtr = Plugin.Configuration.ScaleClearButton ? this.iconFontPtr : UiBuilder.IconFont;
+            ImGui.PushFont(currentIconFontPtr);
             var buttonPos = ImGui.GetWindowContentRegionMax() - (ImGui.CalcTextSize(FontAwesomeIcon.Trash.ToIconString() ?? "") + ImGui.GetStyle().FramePadding * 3.0f);
             ImGui.PopFont();
             ImGui.SetCursorPos(buttonPos);
             if (ImGui.BeginChild("##clearButton"))
             {
-                if (ImGuiComponents.IconButton(FontAwesomeIcon.Trash))
+
+                ImGui.PushFont(currentIconFontPtr);
+                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
                 {
                     Plugin.EmoteQueue.Clear();
                 }
+                ImGui.PopFont();
 
                 if (ImGui.IsItemHovered())
                 {
@@ -114,7 +153,7 @@ public class EmoteLogWindow : Window, IDisposable
         }
     }
 
-    private void addEntry (CollapsedEmoteEntry collapsedEmoteEntry)
+    private void addEntry(CollapsedEmoteEntry collapsedEmoteEntry)
     {
         addEntry(collapsedEmoteEntry.Count, collapsedEmoteEntry.EmoteEntry);
     }
@@ -136,6 +175,13 @@ public class EmoteLogWindow : Window, IDisposable
         {
             sb.Append($" [{count}]");
         }
-        ImGui.Text(sb.ToString());
+        if (Plugin.Configuration.WrapText)
+        {
+            ImGui.TextWrapped(sb.ToString());
+        }
+        else
+        {
+            ImGui.Text(sb.ToString());
+        }
     }
 }

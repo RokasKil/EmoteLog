@@ -17,7 +17,7 @@ namespace EmoteLog
         public string Name => "Emote Log Plugin";
         private const string CommandName = "/el";
 
-        private DalamudPluginInterface PluginInterface { get; init; }
+        public DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("EmoteLog");

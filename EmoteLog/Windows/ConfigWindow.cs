@@ -1,5 +1,9 @@
 using System;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Interface.Colors;
+using Dalamud.Interface;
+using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 
@@ -8,6 +12,8 @@ namespace EmoteLog.Windows;
 public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
+
+    private Plugin Plugin { get; set; }
 
     public ConfigWindow(Plugin plugin) : base(
         "Emote log configuration",
@@ -18,6 +24,8 @@ public class ConfigWindow : Window, IDisposable
         this.SizeCondition = ImGuiCond.Always;
 
         this.Configuration = plugin.Configuration;
+
+        this.Plugin = plugin;
     }
 
     public void Dispose() { }
@@ -36,6 +44,12 @@ public class ConfigWindow : Window, IDisposable
         var inCutscenes = this.Configuration.InCutscenes;
         var hideEmpty = this.Configuration.HideEmpty;
         var showClearButton = this.Configuration.ShowClearButton;
+        var fontSize = this.Configuration.FontSize;
+        var scaleClearButton = this.Configuration.ScaleClearButton;
+        var wrapText = this.Configuration.WrapText;
+
+        ImGui.Text("Log Settings");
+        ImGui.SetNextItemWidth(120f);
         if (ImGui.InputInt("Log size", ref logSize))
         {
             if (logSize > 0 )
@@ -54,6 +68,23 @@ public class ConfigWindow : Window, IDisposable
             Configuration.ShowTimestamps = showTimestamps;
             Configuration.Save();
         }
+        if (ImGui.Checkbox("Show clear button in the Emote Log", ref showClearButton))
+        {
+            Configuration.ShowClearButton = showClearButton;
+            Configuration.Save();
+        }
+        if (ImGui.Checkbox("Wrap Emote Log text", ref wrapText))
+        {
+            Configuration.WrapText = wrapText;
+            Configuration.Save();
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Puts log entries into multiple lines if they don't fit in one");
+        }
+
+        ImGui.Separator();
+        ImGui.Text("Window Settings");
         if (ImGui.Checkbox("Open on login", ref openOnLogin))
         {
             Configuration.OpenOnLogin = openOnLogin;
@@ -94,9 +125,33 @@ public class ConfigWindow : Window, IDisposable
             Configuration.HideEmpty = hideEmpty;
             Configuration.Save();
         }
-        if (ImGui.Checkbox("Show clear button in the Emote Log", ref showClearButton))
+        ImGui.Separator();
+        ImGui.Text("Font Settings");
+        ImGui.SetNextItemWidth(120f);
+        if (ImGui.InputFloat("Emote Log font size", ref fontSize, 1f, 2f, "%.1fpt"))
         {
-            Configuration.ShowClearButton = showClearButton;
+            Configuration.FontSize = fontSize;
+            Configuration.Save();
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Font size is affected by the Global Font Scale setting, default value is 12pt");
+        }
+        ImGui.SameLine();
+        if (ImGuiComponents.IconButton(FontAwesomeIcon.Sync))
+        {
+            Plugin.PluginInterface.UiBuilder.RebuildFonts();
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Refresh fonts");
+        }
+
+        ImGui.TextColored(ImGuiColors.DalamudGrey, "For font size changes to take effect press the refresh button");
+
+        if (ImGui.Checkbox("Font size affects clear button", ref scaleClearButton))
+        {
+            Configuration.ScaleClearButton = scaleClearButton;
             Configuration.Save();
         }
     }

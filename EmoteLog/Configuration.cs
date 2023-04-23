@@ -21,6 +21,9 @@ namespace EmoteLog
         public bool InCutscenes { get; set; } = false;
         public bool HideEmpty { get; set; } = false;
         public bool ShowClearButton { get; set; } = true;
+        public float FontSize { get; set; } = 12.0f;
+        public bool ScaleClearButton { get; set; } = true;
+        public bool WrapText { get; set; } = false;
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;
