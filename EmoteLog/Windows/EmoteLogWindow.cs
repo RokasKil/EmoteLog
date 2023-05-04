@@ -16,6 +16,7 @@ using Dalamud.Interface.Components;
 using Dalamud.Interface;
 using System.IO;
 using System.Runtime.InteropServices;
+using Dalamud.Logging;
 
 namespace EmoteLog.Windows;
 
@@ -65,6 +66,7 @@ public class EmoteLogWindow : Window, IDisposable
         var iconFontPath = Path.Combine(Plugin.PluginInterface.DalamudAssetDirectory.FullName, "UIRes", "FontAwesomeFreeSolid.otf");
         this.iconFontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(iconFontPath, Plugin.Configuration.FontSize * 4.0f / 3.0f, iconFontConfig);
 
+        ImGui.GetIO().Fonts.Build();
         iconFontConfig.Destroy();
         iconRangeHandle.Free();
     }
