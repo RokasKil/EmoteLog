@@ -14,11 +14,9 @@ namespace EmoteLog
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Emote Log Plugin";
         private const string CommandName = "/el";
 
         public DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("EmoteLog");
 
@@ -27,11 +25,9 @@ namespace EmoteLog
         public EmoteReaderHooks EmoteReaderHooks { get; init; }
         public EmoteQueue EmoteQueue { get; init; }
         public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
-            CommandManager = commandManager;
 
             PluginServices.Initialize(PluginInterface);
 
@@ -45,15 +41,16 @@ namespace EmoteLog
             WindowSystem.AddWindow(ConfigWindow);
 
             WindowSystem.AddWindow(MainWindow);
-            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            PluginServices.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = $"Opens the Emote Log window, \"{CommandName} config\" to open settings and \"{CommandName} clear\" to clear the log"
             });
 
-            PluginInterface.UiBuilder.Draw += DrawUI;
-            PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            EmoteQueue = new EmoteQueue(this);
+            PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+            PluginInterface.UiBuilder.OpenConfigUi += ConfigWindow.Toggle;
+            PluginInterface.UiBuilder.OpenMainUi += ToggleMainWindow;
 
+            EmoteQueue = new EmoteQueue(this);
             if (PluginServices.ClientState.IsLoggedIn)
             {
                 OnLogin();
@@ -67,13 +64,10 @@ namespace EmoteLog
             WindowSystem.RemoveAllWindows();
             ConfigWindow.Dispose();
             MainWindow.Dispose();
-            CommandManager.RemoveHandler(CommandName);
+            PluginServices.CommandManager.RemoveHandler(CommandName);
             EmoteReaderHooks.Dispose();
         }
-        private void OnLogin(object? sender, EventArgs e)
-        {
-            OnLogin();
-        }
+
         private void OnLogin()
         {
             if(Configuration.OpenOnLogin)
@@ -81,22 +75,12 @@ namespace EmoteLog
                 MainWindow.IsOpen = true;
             }
         }
+
         private void OnCommand(string command, string args)
         {
             if (args.IsNullOrEmpty())
             {
-                if(!MainWindow.DrawConditions())
-                {
-                    if (!MainWindow.IsOpen)
-                    {
-                        PluginServices.ChatGui.Print("[Emote Log] Emote Log window opened, but your configuration is currently hiding it.");
-                    }
-                    else
-                    {
-                        PluginServices.ChatGui.Print("[Emote Log] Emote Log window closed, your configuration was hiding it.");
-                    }
-                }
-                MainWindow.Toggle();
+                ToggleMainWindow();
             }
             else if (args == "settings" || args == "config")
             {
@@ -111,15 +95,20 @@ namespace EmoteLog
                 PluginServices.ChatGui.PrintError($"[Emote Log] Unknown argument: \"{args}\"");
             }
         }
-
-        private void DrawUI()
+        private void ToggleMainWindow()
         {
-            this.WindowSystem.Draw();
-        }
-
-        public void DrawConfigUI()
-        {
-            ConfigWindow.Toggle();
+            if (!MainWindow.DrawConditions())
+            {
+                if (!MainWindow.IsOpen)
+                {
+                    PluginServices.ChatGui.Print("[Emote Log] Emote Log window opened, but your configuration is currently hiding it.");
+                }
+                else
+                {
+                    PluginServices.ChatGui.Print("[Emote Log] Emote Log window closed, your configuration was hiding it.");
+                }
+            }
+            MainWindow.Toggle();
         }
     }
 }
