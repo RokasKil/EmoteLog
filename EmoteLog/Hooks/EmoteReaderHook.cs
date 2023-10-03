@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using EmoteLog.Utils;
 using System;
 using System.Linq;
@@ -21,8 +22,7 @@ namespace EmoteLog.Hooks
 
         public EmoteReaderHooks()
         {
-            var emoteFuncPtr = PluginServices.SigScanner.ScanText("48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 30 4c 8b 74 24 60 48 8b d9 48 81 c1 60 2f 00 00");
-            hookEmote = Hook<OnEmoteFuncDelegate>.FromAddress(emoteFuncPtr, OnEmoteDetour);
+            hookEmote = PluginServices.GameInteropProvider.HookFromSignature<OnEmoteFuncDelegate>("48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 30 4c 8b 74 24 60 48 8b d9", OnEmoteDetour);
             hookEmote.Enable();
         }
 

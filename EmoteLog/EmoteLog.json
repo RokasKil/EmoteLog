@@ -8,5 +8,6 @@
   "ApplicableVersion": "any",
   "CategoryTags": [
     "social"
-  ]
+  ],
+  "dalamudApiLevel":  9
 }
