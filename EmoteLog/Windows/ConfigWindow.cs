@@ -44,8 +44,9 @@ public class ConfigWindow : Window, IDisposable
         var inCutscenes = this.Configuration.InCutscenes;
         var hideEmpty = this.Configuration.HideEmpty;
         var showClearButton = this.Configuration.ShowClearButton;
+        var useCustomFontSize = this.Configuration.UseCustomFontSize;
         var fontSize = this.Configuration.FontSize;
-        var scaleClearButton = this.Configuration.ScaleClearButton;
+        var iconFontSize = this.Configuration.IconFontSize;
         var wrapText = this.Configuration.WrapText;
 
         ImGui.Text("Log Settings");
@@ -127,32 +128,41 @@ public class ConfigWindow : Window, IDisposable
         }
         ImGui.Separator();
         ImGui.Text("Font Settings");
-        ImGui.SetNextItemWidth(120f);
-        if (ImGui.InputFloat("Emote Log font size", ref fontSize, 1f, 2f, "%.1fpt"))
+
+        if (ImGui.Checkbox("Use custom font size", ref useCustomFontSize))
         {
-            Configuration.FontSize = fontSize;
+            Configuration.UseCustomFontSize = useCustomFontSize;
             Configuration.Save();
         }
-        if (ImGui.IsItemHovered())
+        if (useCustomFontSize)
         {
-            ImGui.SetTooltip("Font size is affected by the Global Font Scale setting, default value is 12pt");
+            ImGui.SetNextItemWidth(120f);
+            if (ImGui.InputFloat("Emote Log font size", ref fontSize, 1f, 2f, "%.1fpt"))
+            {
+                fontSize = Math.Max(fontSize, 1f);
+                Configuration.FontSize = fontSize;
+                Configuration.Save();
+            }
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Font size is affected by the Global Font Scale setting, default value is 12pt");
+            }
+            ImGui.SetNextItemWidth(120f);
+            if (ImGui.InputFloat("Clear button font size", ref iconFontSize, 1f, 2f, "%.1fpt"))
+            {
+                iconFontSize = Math.Max(iconFontSize, 1f);
+                Configuration.IconFontSize = iconFontSize;
+                Configuration.Save();
+            }
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Font size is affected by the Global Font Scale setting, default value is 12pt");
+            }
         }
-        ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Sync))
+        if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Sync, "Refresh fonts"))
         {
-            Plugin.PluginInterface.UiBuilder.RebuildFonts();
+            Plugin.PluginInterface.UiBuilder.FontAtlas.BuildFontsAsync();
         }
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Refresh fonts");
-        }
-
         ImGui.TextColored(ImGuiColors.DalamudGrey, "For font size changes to take effect press the refresh button");
-
-        if (ImGui.Checkbox("Font size affects clear button", ref scaleClearButton))
-        {
-            Configuration.ScaleClearButton = scaleClearButton;
-            Configuration.Save();
-        }
     }
 }

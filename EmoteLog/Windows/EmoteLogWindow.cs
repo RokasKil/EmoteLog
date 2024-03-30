@@ -17,6 +17,7 @@ using Dalamud.Interface;
 using System.IO;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
+using Dalamud.Interface.ManagedFontAtlas;
 
 namespace EmoteLog.Windows;
 
@@ -24,9 +25,9 @@ public class EmoteLogWindow : Window, IDisposable
 {
     private Plugin Plugin { get; set; }
 
-    private ImFontPtr fontPtr;
+    private IFontHandle font;
 
-    private ImFontPtr iconFontPtr;
+    private IFontHandle iconFont;
 
     public EmoteLogWindow(Plugin plugin) : base(
         "Emote Log", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -44,43 +45,30 @@ public class EmoteLogWindow : Window, IDisposable
 
 
         Plugin = plugin;
-
-        Plugin.PluginInterface.UiBuilder.BuildFonts += this.HandleBuildFonts;
-        Plugin.PluginInterface.UiBuilder.RebuildFonts();
+        font = Plugin.PluginInterface.UiBuilder.FontAtlas.NewDelegateFontHandle(
+            e => e.OnPreBuild(
+                tk => tk.AddDalamudDefaultFont(Plugin.Configuration.UseCustomFontSize ? (Plugin.Configuration.FontSize * 4 / 3) : UiBuilder.DefaultFontSizePx)));
+        iconFont = Plugin.PluginInterface.UiBuilder.FontAtlas.NewDelegateFontHandle(
+            e => e.OnPreBuild(
+                tk => tk.AddDalamudAssetFont(
+                    Dalamud.DalamudAsset.FontAwesomeFreeSolid,
+                    new() { 
+                        SizePt = Plugin.Configuration.UseCustomFontSize ? Plugin.Configuration.IconFontSize : UiBuilder.DefaultFontSizePt, 
+                        GlyphRanges = FontAtlasBuildToolkitUtilities.ToGlyphRange(FontAwesomeIcon.Trash.ToIconString())
+                    })));
     }
-    
-    private unsafe void HandleBuildFonts()
-    {
-        ImFontConfigPtr iconFontConfig = ImGuiNative.ImFontConfig_ImFontConfig();
-
-        iconFontConfig.OversampleH = 1;
-        iconFontConfig.OversampleV = 1;
-        iconFontConfig.PixelSnapH = true;
-
-        var fontPath = Path.Combine(Plugin.PluginInterface.DalamudAssetDirectory.FullName, "UIRes", "NotoSansCJKjp-Medium.otf");
-        this.fontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, Plugin.Configuration.FontSize * 4.0f / 3.0f + 1, iconFontConfig);
-
-        var iconRangeHandle = GCHandle.Alloc(new ushort[] { (ushort)FontAwesomeIcon.Trash, (ushort)FontAwesomeIcon.Trash + 1, 0, }, GCHandleType.Pinned);
-        iconFontConfig.GlyphRanges = iconRangeHandle.AddrOfPinnedObject();
-        
-        var iconFontPath = Path.Combine(Plugin.PluginInterface.DalamudAssetDirectory.FullName, "UIRes", "FontAwesomeFreeSolid.otf");
-        this.iconFontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(iconFontPath, Plugin.Configuration.FontSize * 4.0f / 3.0f, iconFontConfig);
-
-        ImGui.GetIO().Fonts.Build();
-        iconFontConfig.Destroy();
-        iconRangeHandle.Free();
-    }
-
     public void Dispose()
     {
-        Plugin.PluginInterface.UiBuilder.BuildFonts -= this.HandleBuildFonts;
+        font.Dispose();
+        iconFont.Dispose();
     }
     public override bool DrawConditions()
     {
         return (!ConditionUtils.AnyCondition(ConditionUtils.CombatFlags) || Plugin.Configuration.InCombat)
             && (!ConditionUtils.AnyCondition(ConditionUtils.InstanceFlags) || Plugin.Configuration.InInstance)
             && (!ConditionUtils.AnyCondition(ConditionUtils.CutsceneFlags) || Plugin.Configuration.InCutscenes)
-            && (Plugin.EmoteQueue.Log.Count != 0 || !Plugin.Configuration.HideEmpty);
+            && (Plugin.EmoteQueue.Log.Count != 0 || !Plugin.Configuration.HideEmpty)
+            && font.Available && iconFont.Available;
     }
 
     public override void PreDraw()
@@ -105,45 +93,47 @@ public class EmoteLogWindow : Window, IDisposable
     {
         var height = ImGui.GetContentRegionAvail().Y;
 
-        ImGui.PushFont(this.fontPtr);
-        if (ImGui.BeginListBox("##emoteLog", new Vector2(-1, height)))
+        using (font.Push())
         {
-
-            if (Plugin.Configuration.CollapseSpam)
+            if (ImGui.BeginListBox("##emoteLog", new Vector2(-1, height)))
             {
-                foreach (CollapsedEmoteEntry collapsedEmoteEntry in Plugin.EmoteQueue.CollapsedLog)
-                {
-                    addEntry(collapsedEmoteEntry);
-                }
-            }
-            else
-            {
-                foreach (EmoteEntry emoteEntry in Plugin.EmoteQueue.Log)
-                {
-                    addEntry(emoteEntry);
-                }
-            }
 
-            ImGui.EndListBox();
+                if (Plugin.Configuration.CollapseSpam)
+                {
+                    foreach (CollapsedEmoteEntry collapsedEmoteEntry in Plugin.EmoteQueue.CollapsedLog)
+                    {
+                        AddEntry(collapsedEmoteEntry);
+                    }
+                }
+                else
+                {
+                    foreach (EmoteEntry emoteEntry in Plugin.EmoteQueue.Log)
+                    {
+                        AddEntry(emoteEntry);
+                    }
+                }
+
+                ImGui.EndListBox();
+            }
         }
-        ImGui.PopFont();
-
         if (Plugin.Configuration.ShowClearButton)
         {
-            var currentIconFontPtr = Plugin.Configuration.ScaleClearButton ? this.iconFontPtr : UiBuilder.IconFont;
-            ImGui.PushFont(currentIconFontPtr);
-            var buttonPos = ImGui.GetWindowContentRegionMax() - (ImGui.CalcTextSize(FontAwesomeIcon.Trash.ToIconString() ?? "") + ImGui.GetStyle().FramePadding * 3.0f);
-            ImGui.PopFont();
+            Vector2 buttonPos;
+            using (iconFont.Push())
+            {
+                buttonPos = ImGui.GetWindowContentRegionMax() - (ImGui.CalcTextSize(FontAwesomeIcon.Trash.ToIconString() ?? "") + ImGui.GetStyle().FramePadding * 3.0f);
+            }
             ImGui.SetCursorPos(buttonPos);
             if (ImGui.BeginChild("##clearButton"))
             {
 
-                ImGui.PushFont(currentIconFontPtr);
-                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                using (iconFont.Push())
                 {
-                    Plugin.EmoteQueue.Clear();
+                    if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                    {
+                        Plugin.EmoteQueue.Clear();
+                    }
                 }
-                ImGui.PopFont();
 
                 if (ImGui.IsItemHovered())
                 {
@@ -155,19 +145,19 @@ public class EmoteLogWindow : Window, IDisposable
         }
     }
 
-    private void addEntry(CollapsedEmoteEntry collapsedEmoteEntry)
+    private void AddEntry(CollapsedEmoteEntry collapsedEmoteEntry)
     {
-        addEntry(collapsedEmoteEntry.Count, collapsedEmoteEntry.EmoteEntry);
+        AddEntry(collapsedEmoteEntry.Count, collapsedEmoteEntry.EmoteEntry);
     }
 
-    private void addEntry(EmoteEntry emoteEntry)
+    private void AddEntry(EmoteEntry emoteEntry)
     {
-        addEntry(1, emoteEntry);
+        AddEntry(1, emoteEntry);
     }
 
-    private void addEntry(int count, EmoteEntry emoteEntry)
+    private void AddEntry(int count, EmoteEntry emoteEntry)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         if (Plugin.Configuration.ShowTimestamps)
         {
             sb.Append($"[{emoteEntry.Timestamp.ToString("t")}] ");

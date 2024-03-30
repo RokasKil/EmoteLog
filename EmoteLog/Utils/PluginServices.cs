@@ -15,6 +15,7 @@ namespace EmoteLog.Utils
         [PluginService] public static ICondition Condition { get; set; } = null!;
         [PluginService] public static IGameInteropProvider GameInteropProvider { get; set; } = null!;
         [PluginService] public static ICommandManager CommandManager { get; set; } = null!;
+        [PluginService] public static IPluginLog PluginLog { get; set; } = null!;
         public static void Initialize(DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<PluginServices>();

@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Authors></Authors>
     <Company></Company>
-    <Version>1.1.1.1</Version>
+    <Version>1.1.2.1</Version>
     <Description>Emote Log plugin</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/RokasKil/EmoteLog</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Platforms>x64</Platforms>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>

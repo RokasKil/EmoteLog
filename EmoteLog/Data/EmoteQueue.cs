@@ -19,21 +19,21 @@ namespace EmoteLog.Data
             this.Plugin = plugin;
             this.Log = new LinkedList<EmoteEntry>();
             this.CollapsedLog = new LinkedList<CollapsedEmoteEntry>();
-            this.Plugin.EmoteReaderHooks.OnEmote += onEmote;
+            this.Plugin.EmoteReaderHooks.OnEmote += OnEmote;
         }
         
-        private void onEmote(PlayerCharacter playerCharacter, ushort emoteId)
+        private void OnEmote(PlayerCharacter playerCharacter, ushort emoteId)
         {
             if (this.Log.Count > 0)
             {
                 while (this.Plugin.Configuration.LogSize <= this.Log.Count)
                 {
-                    dequeue();
+                    Dequeue();
                 }
             }
-            EmoteEntry emoteEntry = new EmoteEntry(playerCharacter.Name.ToString(), playerCharacter.HomeWorld.Id, emoteId);
+            EmoteEntry emoteEntry = new(playerCharacter.Name.ToString(), playerCharacter.HomeWorld.Id, emoteId);
             this.Log.AddFirst(emoteEntry);
-            if (this.CollapsedLog.Count == 0 || this.CollapsedLog.First().EmoteEntry != emoteEntry)
+            if (this.CollapsedLog.Count == 0 || !this.CollapsedLog.First().EmoteEntry.Equals(emoteEntry))
             {
                 this.CollapsedLog.AddFirst(new CollapsedEmoteEntry(1, emoteEntry));
             }
@@ -46,7 +46,7 @@ namespace EmoteLog.Data
             
         }
 
-        private void dequeue()
+        private void Dequeue()
         {
             this.Log.RemoveLast();
             CollapsedEmoteEntry collapsedEntry = this.CollapsedLog.Last();
@@ -59,7 +59,7 @@ namespace EmoteLog.Data
 
         public void Dispose()
         {
-            this.Plugin.EmoteReaderHooks.OnEmote -= onEmote;
+            this.Plugin.EmoteReaderHooks.OnEmote -= OnEmote;
             Clear();
         }
 

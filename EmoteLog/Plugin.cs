@@ -78,7 +78,7 @@ namespace EmoteLog
 
         private void OnCommand(string command, string args)
         {
-            if (args.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(args))
             {
                 ToggleMainWindow();
             }

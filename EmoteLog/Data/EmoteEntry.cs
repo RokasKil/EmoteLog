@@ -29,13 +29,19 @@ namespace EmoteLog.Data
         public EmoteEntry(string playerName, uint homeWorld, ushort emoteId, string emoteName) : this(DateTime.Now, playerName, homeWorld, emoteId, emoteName) { }
         public EmoteEntry(string playerName, uint homeWorld, ushort emoteId) : this(playerName, homeWorld, emoteId, EmoteDataUtils.GetEmoteNameById(emoteId) ?? "null") { }
 
-        public static bool operator ==(EmoteEntry a, EmoteEntry b)
+        public override bool Equals(object? obj)
         {
-            return a.PlayerName == b.PlayerName && a.HomeWorld == b.HomeWorld && a.EmoteId == b.EmoteId;
+            if (obj is EmoteEntry entry)
+            {
+                return this.PlayerName == entry.PlayerName && this.HomeWorld == entry.HomeWorld && this.EmoteId == entry.EmoteId;
+
+            }
+            return false;
         }
-        public static bool operator !=(EmoteEntry a, EmoteEntry b)
+
+        public override int GetHashCode()
         {
-            return !(a == b);
+            return HashCode.Combine(PlayerName, HomeWorld, EmoteId);
         }
     }
 }
