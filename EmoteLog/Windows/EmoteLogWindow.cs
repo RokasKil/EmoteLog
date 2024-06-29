@@ -1,23 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text;
-using Dalamud.Interface.Windowing;
-using ImGuiNET;
-using ImGuiScene;
-using System.Linq;
-using EmoteLog.Data;
-using System.Text;
-using EmoteLog.Utils;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Interface.Components;
 using Dalamud.Interface;
-using System.IO;
-using System.Runtime.InteropServices;
-using Dalamud.Logging;
 using Dalamud.Interface.ManagedFontAtlas;
+using Dalamud.Interface.Windowing;
+using EmoteLog.Data;
+using EmoteLog.Utils;
+using ImGuiNET;
+using System;
+using System.Numerics;
+using System.Text;
 
 namespace EmoteLog.Windows;
 
@@ -52,8 +42,9 @@ public class EmoteLogWindow : Window, IDisposable
             e => e.OnPreBuild(
                 tk => tk.AddDalamudAssetFont(
                     Dalamud.DalamudAsset.FontAwesomeFreeSolid,
-                    new() { 
-                        SizePt = Plugin.Configuration.UseCustomFontSize ? Plugin.Configuration.IconFontSize : UiBuilder.DefaultFontSizePt, 
+                    new()
+                    {
+                        SizePt = Plugin.Configuration.UseCustomFontSize ? Plugin.Configuration.IconFontSize : UiBuilder.DefaultFontSizePt,
                         GlyphRanges = FontAtlasBuildToolkitUtilities.ToGlyphRange(FontAwesomeIcon.Trash.ToIconString())
                     })));
     }

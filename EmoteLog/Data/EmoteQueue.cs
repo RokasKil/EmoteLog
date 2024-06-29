@@ -1,10 +1,7 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EmoteLog.Data
 {
@@ -21,8 +18,8 @@ namespace EmoteLog.Data
             this.CollapsedLog = new LinkedList<CollapsedEmoteEntry>();
             this.Plugin.EmoteReaderHooks.OnEmote += OnEmote;
         }
-        
-        private void OnEmote(PlayerCharacter playerCharacter, ushort emoteId)
+
+        private void OnEmote(IPlayerCharacter playerCharacter, ushort emoteId)
         {
             if (this.Log.Count > 0)
             {
@@ -43,7 +40,7 @@ namespace EmoteLog.Data
                 collapsedEmoteEntry.Count++;
                 collapsedEmoteEntry.EmoteEntry = emoteEntry;
             }
-            
+
         }
 
         private void Dequeue()

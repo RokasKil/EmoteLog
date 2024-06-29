@@ -1,14 +1,10 @@
 using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
-using System.IO;
 using Dalamud.Interface.Windowing;
-using EmoteLog.Windows;
+using Dalamud.Plugin;
+using EmoteLog.Data;
 using EmoteLog.Hooks;
 using EmoteLog.Utils;
-using EmoteLog.Data;
-using System;
-using Dalamud.Utility;
+using EmoteLog.Windows;
 
 namespace EmoteLog
 {
@@ -16,7 +12,7 @@ namespace EmoteLog
     {
         private const string CommandName = "/el";
 
-        public DalamudPluginInterface PluginInterface { get; init; }
+        public IDalamudPluginInterface PluginInterface { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("EmoteLog");
 
@@ -24,8 +20,7 @@ namespace EmoteLog
         private EmoteLogWindow MainWindow { get; init; }
         public EmoteReaderHooks EmoteReaderHooks { get; init; }
         public EmoteQueue EmoteQueue { get; init; }
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
+        public Plugin(IDalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
 
@@ -37,7 +32,7 @@ namespace EmoteLog
 
             ConfigWindow = new ConfigWindow(this);
             MainWindow = new EmoteLogWindow(this);
-            
+
             WindowSystem.AddWindow(ConfigWindow);
 
             WindowSystem.AddWindow(MainWindow);
@@ -70,7 +65,7 @@ namespace EmoteLog
 
         private void OnLogin()
         {
-            if(Configuration.OpenOnLogin)
+            if (Configuration.OpenOnLogin)
             {
                 MainWindow.IsOpen = true;
             }
@@ -85,7 +80,7 @@ namespace EmoteLog
             else if (args == "settings" || args == "config")
             {
                 ConfigWindow.Toggle();
-            }  
+            }
             else if (args == "clear")
             {
                 EmoteQueue.Clear();

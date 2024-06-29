@@ -1,11 +1,10 @@
-using System;
-using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Interface.Colors;
 using Dalamud.Interface;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using System;
+using System.Numerics;
 
 namespace EmoteLog.Windows;
 
@@ -53,7 +52,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SetNextItemWidth(120f);
         if (ImGui.InputInt("Log size", ref logSize))
         {
-            if (logSize > 0 )
+            if (logSize > 0)
             {
                 Configuration.LogSize = logSize;
                 Configuration.Save();

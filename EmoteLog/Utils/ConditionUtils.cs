@@ -1,9 +1,4 @@
 using Dalamud.Game.ClientState.Conditions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EmoteLog.Utils
 {
@@ -20,7 +15,7 @@ namespace EmoteLog.Utils
                 {
                     return true;
                 }
-                
+
             }
             return false;
         }

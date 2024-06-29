@@ -1,6 +1,6 @@
+using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Game;
 using Dalamud.Plugin.Services;
 
 namespace EmoteLog.Utils
@@ -16,7 +16,7 @@ namespace EmoteLog.Utils
         [PluginService] public static IGameInteropProvider GameInteropProvider { get; set; } = null!;
         [PluginService] public static ICommandManager CommandManager { get; set; } = null!;
         [PluginService] public static IPluginLog PluginLog { get; set; } = null!;
-        public static void Initialize(DalamudPluginInterface pluginInterface)
+        public static void Initialize(IDalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<PluginServices>();
         }
