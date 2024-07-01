@@ -1,5 +1,6 @@
 //Lifted from https://github.com/MgAl2O4/PatMeDalamud
 //and modified by me
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
 using EmoteLog.Utils;
 using System;
