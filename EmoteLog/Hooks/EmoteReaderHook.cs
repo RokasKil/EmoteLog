@@ -14,12 +14,12 @@ namespace EmoteLog.Hooks
 
         public event EmoteDelegate? OnEmote;
 
-        public delegate void OnEmoteFuncDelegate(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2);
+        private delegate void OnEmoteFuncDelegate(ulong unk, ulong instigatorAddr, ushort emoteId, ulong targetId, ulong unk2);
         private readonly Hook<OnEmoteFuncDelegate> hookEmote;
 
         public EmoteReaderHooks()
         {
-            hookEmote = PluginServices.GameInteropProvider.HookFromSignature<OnEmoteFuncDelegate>("40 53 56 41 54 41 57 48 83 EC ?? 48 8B 02", OnEmoteDetour);
+            hookEmote = PluginServices.GameInteropProvider.HookFromSignature<OnEmoteFuncDelegate>("E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ?? 4C 89 74 24", OnEmoteDetour);
             hookEmote.Enable();
         }
 
@@ -38,7 +38,7 @@ namespace EmoteLog.Hooks
                 if (targetId == PluginServices.ClientState.LocalPlayer.GameObjectId)
                 {
                     var instigatorOb = PluginServices.ObjectTable.FirstOrDefault(x => (ulong)x.Address == instigatorAddr);
-                    if (instigatorOb != null && instigatorOb is IPlayerCharacter playerCharacter)
+                    if (instigatorOb is IPlayerCharacter playerCharacter)
                     {
                         OnEmote?.Invoke(playerCharacter, emoteId);
                     }

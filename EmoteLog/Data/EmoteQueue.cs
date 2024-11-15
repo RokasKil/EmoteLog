@@ -28,7 +28,7 @@ namespace EmoteLog.Data
                     Dequeue();
                 }
             }
-            EmoteEntry emoteEntry = new(playerCharacter.Name.ToString(), playerCharacter.HomeWorld.Id, emoteId);
+            EmoteEntry emoteEntry = new(playerCharacter.Name.ToString(), playerCharacter.HomeWorld.RowId, emoteId);
             this.Log.AddFirst(emoteEntry);
             if (this.CollapsedLog.Count == 0 || !this.CollapsedLog.First().EmoteEntry.Equals(emoteEntry))
             {

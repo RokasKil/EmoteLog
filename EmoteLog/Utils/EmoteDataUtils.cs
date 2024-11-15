@@ -1,12 +1,12 @@
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace EmoteLog.Utils
 {
-    public class EmoteDataUtils
+    public static class EmoteDataUtils
     {
         public static string? GetEmoteNameById(ushort id)
         {
-            return PluginServices.DataManager.GetExcelSheet<Emote>()?.GetRow(id)?.Name.ToString();
+            return PluginServices.DataManager.GetExcelSheet<Emote>().TryGetRow(id, out var row) ? row.Name.ExtractText() : null;
         }
 
     }
