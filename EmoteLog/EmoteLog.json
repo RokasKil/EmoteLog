@@ -8,5 +8,11 @@
   "ApplicableVersion": "any",
   "CategoryTags": [
     "social"
+  ],
+  "Tags": [
+    "UI",
+    "social",
+    "emote",
+    "log"
   ]
 }
