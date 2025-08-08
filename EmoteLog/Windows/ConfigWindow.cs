@@ -2,15 +2,15 @@ using Dalamud.Interface;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
 using System;
 using System.Numerics;
+using Dalamud.Bindings.ImGui;
 
 namespace EmoteLog.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
-    private Configuration Configuration;
+    private Configuration Configuration  { get; set; }
 
     private Plugin Plugin { get; set; }
 
@@ -19,34 +19,34 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize)
     {
-        this.Size = new Vector2(0, 0);
-        this.SizeCondition = ImGuiCond.Always;
+        Size = new Vector2(0, 0);
+        SizeCondition = ImGuiCond.Always;
 
-        this.Configuration = plugin.Configuration;
+        Configuration = plugin.Configuration;
 
-        this.Plugin = plugin;
+        Plugin = plugin;
     }
 
     public void Dispose() { }
 
     public override void Draw()
     {
-        var logSize = this.Configuration.LogSize;
-        var collapseSpam = this.Configuration.CollapseSpam;
-        var showTimestamps = this.Configuration.ShowTimestamps;
-        var openOnLogin = this.Configuration.OpenOnLogin;
-        var moveWindow = this.Configuration.MoveWindow;
-        var resizeWindow = this.Configuration.ResizeWindow;
-        var showWindowFrames = this.Configuration.ShowWindowFrames;
-        var inCombat = this.Configuration.InCombat;
-        var inInstance = this.Configuration.InInstance;
-        var inCutscenes = this.Configuration.InCutscenes;
-        var hideEmpty = this.Configuration.HideEmpty;
-        var showClearButton = this.Configuration.ShowClearButton;
-        var useCustomFontSize = this.Configuration.UseCustomFontSize;
-        var fontSize = this.Configuration.FontSize;
-        var iconFontSize = this.Configuration.IconFontSize;
-        var wrapText = this.Configuration.WrapText;
+        var logSize = Configuration.LogSize;
+        var collapseSpam = Configuration.CollapseSpam;
+        var showTimestamps = Configuration.ShowTimestamps;
+        var openOnLogin = Configuration.OpenOnLogin;
+        var moveWindow = Configuration.MoveWindow;
+        var resizeWindow = Configuration.ResizeWindow;
+        var showWindowFrames = Configuration.ShowWindowFrames;
+        var inCombat = Configuration.InCombat;
+        var inInstance = Configuration.InInstance;
+        var inCutscenes = Configuration.InCutscenes;
+        var hideEmpty = Configuration.HideEmpty;
+        var showClearButton = Configuration.ShowClearButton;
+        var useCustomFontSize = Configuration.UseCustomFontSize;
+        var fontSize = Configuration.FontSize;
+        var iconFontSize = Configuration.IconFontSize;
+        var wrapText = Configuration.WrapText;
 
         ImGui.Text("Log Settings");
         ImGui.SetNextItemWidth(120f);

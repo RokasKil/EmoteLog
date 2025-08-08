@@ -4,10 +4,11 @@ using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Windowing;
 using EmoteLog.Data;
 using EmoteLog.Utils;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 using System.Text;
+using Dalamud.Interface.Utility.Raii;
 
 namespace EmoteLog.Windows;
 
@@ -22,15 +23,15 @@ public class EmoteLogWindow : Window, IDisposable
     public EmoteLogWindow(Plugin plugin) : base(
         "Emote Log", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.SizeConstraints = new WindowSizeConstraints
+        SizeConstraints = new WindowSizeConstraints
         {
             MinimumSize = new Vector2(10, 10),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
-        this.RespectCloseHotkey = false;
+        RespectCloseHotkey = false;
 
-        this.SizeCondition = ImGuiCond.FirstUseEver;
-        this.Size = new Vector2(300, 150);
+        SizeCondition = ImGuiCond.FirstUseEver;
+        Size = new Vector2(300, 150);
 
 
 
@@ -65,18 +66,18 @@ public class EmoteLogWindow : Window, IDisposable
     public override void PreDraw()
     {
         base.PreDraw();
-        this.Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+        Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
         if (!Plugin.Configuration.MoveWindow)
         {
-            this.Flags |= ImGuiWindowFlags.NoMove;
+            Flags |= ImGuiWindowFlags.NoMove;
         }
         if (!Plugin.Configuration.ResizeWindow)
         {
-            this.Flags |= ImGuiWindowFlags.NoResize;
+            Flags |= ImGuiWindowFlags.NoResize;
         }
         if (!Plugin.Configuration.ShowWindowFrames)
         {
-            this.Flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
+            Flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
         }
     }
 
@@ -86,7 +87,8 @@ public class EmoteLogWindow : Window, IDisposable
 
         using (font.Push())
         {
-            if (ImGui.BeginListBox("##emoteLog", new Vector2(-1, height)))
+            using var listBox = ImRaii.ListBox("##emoteLogListBox", new Vector2(-1, height));
+            if (listBox)
             {
 
                 if (Plugin.Configuration.CollapseSpam)
@@ -103,8 +105,6 @@ public class EmoteLogWindow : Window, IDisposable
                         AddEntry(emoteEntry);
                     }
                 }
-
-                ImGui.EndListBox();
             }
         }
         if (Plugin.Configuration.ShowClearButton)
@@ -115,7 +115,8 @@ public class EmoteLogWindow : Window, IDisposable
                 buttonPos = ImGui.GetWindowContentRegionMax() - (ImGui.CalcTextSize(FontAwesomeIcon.Trash.ToIconString() ?? "") + ImGui.GetStyle().FramePadding * 3.0f);
             }
             ImGui.SetCursorPos(buttonPos);
-            if (ImGui.BeginChild("##clearButton"))
+            using var clearButtonContainer = ImRaii.Child("##clearButton");
+            if (clearButtonContainer)
             {
 
                 using (iconFont.Push())
@@ -131,8 +132,6 @@ public class EmoteLogWindow : Window, IDisposable
                     ImGui.SetTooltip("Clear Emote Log");
                 }
             }
-
-            ImGui.EndChild();
         }
     }
 
