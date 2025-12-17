@@ -33,9 +33,9 @@ namespace EmoteLog.Hooks
             // unk - some field of event framework singleton? doesn't matter here anyway
             //PluginServices.PluginLog.Info($"Emote >> unk:{unk:X}, instigatorAddr:{instigatorAddr:X}, emoteId:{emoteId}, targetId:{targetId:X}, unk2:{unk2:X}");
 
-            if (PluginServices.ClientState.LocalPlayer != null)
+            if (PluginServices.ObjectTable.LocalPlayer != null)
             {
-                if (targetId == PluginServices.ClientState.LocalPlayer.GameObjectId)
+                if (targetId == PluginServices.ObjectTable.LocalPlayer.GameObjectId)
                 {
                     var instigatorOb = PluginServices.ObjectTable.FirstOrDefault(x => (ulong)x.Address == instigatorAddr);
                     if (instigatorOb is IPlayerCharacter playerCharacter)

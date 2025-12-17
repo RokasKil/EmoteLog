@@ -10,7 +10,6 @@ namespace EmoteLog.Utils
         [PluginService] public static IChatGui ChatGui { get; set; } = null!;
         [PluginService] public static IObjectTable ObjectTable { get; set; } = null!;
         [PluginService] public static IClientState ClientState { get; set; } = null!;
-        [PluginService] public static ISigScanner SigScanner { get; set; } = null!;
         [PluginService] public static IDataManager DataManager { get; set; } = null!;
         [PluginService] public static ICondition Condition { get; set; } = null!;
         [PluginService] public static IGameInteropProvider GameInteropProvider { get; set; } = null!;
