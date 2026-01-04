@@ -10,7 +10,9 @@ namespace EmoteLog
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        private const string CommandName = "/el";
+        // TODO: Remove the old one in like a month
+        private const string OldCommandName = "/el";
+        private const string CommandName = "/elog";
 
         public IDalamudPluginInterface PluginInterface { get; init; }
         public Configuration Configuration { get; init; }
@@ -40,6 +42,10 @@ namespace EmoteLog
             {
                 HelpMessage = $"Opens the Emote Log window, \"{CommandName} config\" to open settings and \"{CommandName} clear\" to clear the log"
             });
+            PluginServices.CommandManager.AddHandler(OldCommandName, new CommandInfo(OnOldCommand)
+            {
+                ShowInHelp = false
+            });
 
             PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
             PluginInterface.UiBuilder.OpenConfigUi += ConfigWindow.Toggle;
@@ -60,6 +66,7 @@ namespace EmoteLog
             ConfigWindow.Dispose();
             MainWindow.Dispose();
             PluginServices.CommandManager.RemoveHandler(CommandName);
+            PluginServices.CommandManager.RemoveHandler(OldCommandName);
             EmoteReaderHooks.Dispose();
         }
 
@@ -69,6 +76,14 @@ namespace EmoteLog
             {
                 MainWindow.IsOpen = true;
             }
+        }
+
+        private void OnOldCommand(string command, string args)
+        {
+            PluginServices.ChatGui.PrintError(
+                "[Emote Log] The command /el will soon be removed due to conflict with other plugins." +
+                " Please switch to /elog.");
+            OnCommand(command, args);
         }
 
         private void OnCommand(string command, string args)
