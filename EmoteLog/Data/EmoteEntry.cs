@@ -9,10 +9,10 @@ namespace EmoteLog.Data
         public string PlayerName { get; set; }
         public uint HomeWorld { get; set; }
 
-        public ushort EmoteId { get; set; }
+        public uint EmoteId { get; set; }
 
         public string EmoteName { get; set; }
-        public EmoteEntry(DateTime timestamp, string playerName, uint homeWorld, ushort emoteId, string emoteName)
+        public EmoteEntry(DateTime timestamp, string playerName, uint homeWorld, uint emoteId, string emoteName)
         {
             Timestamp = timestamp;
             PlayerName = playerName;
@@ -20,8 +20,8 @@ namespace EmoteLog.Data
             EmoteId = emoteId;
             EmoteName = emoteName;
         }
-        public EmoteEntry(string playerName, uint homeWorld, ushort emoteId, string emoteName) : this(DateTime.Now, playerName, homeWorld, emoteId, emoteName) { }
-        public EmoteEntry(string playerName, uint homeWorld, ushort emoteId) : this(playerName, homeWorld, emoteId, EmoteDataUtils.GetEmoteNameById(emoteId) ?? "null") { }
+        public EmoteEntry(string playerName, uint homeWorld, uint emoteId, string emoteName) : this(DateTime.Now, playerName, homeWorld, emoteId, emoteName) { }
+        public EmoteEntry(string playerName, uint homeWorld, uint emoteId) : this(playerName, homeWorld, emoteId, EmoteDataUtils.GetEmoteNameById(emoteId) ?? "null") { }
 
         public override bool Equals(object? obj)
         {

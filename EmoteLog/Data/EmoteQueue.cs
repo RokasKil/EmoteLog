@@ -19,7 +19,7 @@ namespace EmoteLog.Data
             this.Plugin.EmoteReaderHooks.OnEmote += OnEmote;
         }
 
-        private void OnEmote(IPlayerCharacter playerCharacter, ushort emoteId)
+        private void OnEmote(IPlayerCharacter playerCharacter, uint emoteId)
         {
             if (this.Log.Count > 0)
             {
