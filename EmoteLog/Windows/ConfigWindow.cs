@@ -5,6 +5,8 @@ using Dalamud.Interface.Windowing;
 using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility.Raii;
+using Dalamud.Utility;
 
 namespace EmoteLog.Windows;
 
@@ -30,6 +32,16 @@ public class ConfigWindow : Window, IDisposable
     public void Dispose() { }
 
     public override void Draw()
+    {
+        using (ImRaii.Group())
+        {
+            DrawConfiguration();
+        }
+
+        KofiButton(ImGui.GetItemRectSize().X + ImGui.GetStyle().WindowPadding.X);
+    }
+    
+    private void DrawConfiguration()
     {
         var logSize = Configuration.LogSize;
         var collapseSpam = Configuration.CollapseSpam;
@@ -163,5 +175,30 @@ public class ConfigWindow : Window, IDisposable
             Plugin.PluginInterface.UiBuilder.FontAtlas.BuildFontsAsync();
         }
         ImGui.TextColored(ImGuiColors.DalamudGrey, "For font size changes to take effect press the refresh button");
+    }
+
+    private void KofiButton(float contentWidth)
+    {
+        var size = ImGui.CalcTextSize("Buy my cat a treat on Ko-fi") + ImGui.GetStyle().FramePadding * 2;
+        if (SizeConstraints.HasValue)
+        {
+            var minimumSize = SizeConstraints.Value.MinimumSize * ImGui.GetIO().FontGlobalScale;
+            contentWidth = Math.Max(contentWidth, minimumSize.X);
+            if (ImGui.GetCursorPosY() + size.Y + ImGui.GetStyle().WindowPadding.Y <= minimumSize.Y)
+            {
+                ImGui.SetCursorPosY(minimumSize.Y - size.Y - ImGui.GetStyle().WindowPadding.Y);
+            }
+        }
+
+        ImGui.Separator();
+        ImGui.SetCursorPosX(contentWidth - size.X);
+        using (ImRaii.PushColor(ImGuiCol.Text, 0xFFFFFFFF))
+        using (ImRaii.PushColor(ImGuiCol.Button, 0xFFFF478E))
+        using (ImRaii.PushColor(ImGuiCol.ButtonHovered, 0xFFFF2478))
+        using (ImRaii.PushColor(ImGuiCol.ButtonActive, 0xFFBD0048))
+            if (ImGui.Button("Buy my cat a treat on Ko-fi"))
+            {
+                Util.OpenLink("https://ko-fi.com/speedas");
+            }
     }
 }
